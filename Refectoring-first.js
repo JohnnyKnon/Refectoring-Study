@@ -30,6 +30,7 @@ function statement(invoice, plays) {
   function enrichPerformance(aPerformance) {
     const result = Object.assign({}, aPerformance); // 얕은 복사 수행
     result.play = playFor(result);
+    result.amount = amountFor(result);
     return result;
   }
 
@@ -40,15 +41,7 @@ function statement(invoice, plays) {
   function playFor(aPerformance) {
     return plays[aPerformance.playID];
   }
-}
 
-/**
- * 공연료 청구서를 단순 텍스트로 출력하는 함수
- * @param {*} data 고객정보, 공연정보,
- * @param {*} plays 공연 시나리오 정보
- * @returns 청구서
- */
-function renderPlainText(data, plays) {
   /**
    * 금액 계산 함수
    * @param {*} aPerformance 각 공연 관련 값
@@ -79,7 +72,15 @@ function renderPlainText(data, plays) {
 
     return result;
   }
+}
 
+/**
+ * 공연료 청구서를 단순 텍스트로 출력하는 함수
+ * @param {*} data 고객정보, 공연정보,
+ * @param {*} plays 공연 시나리오 정보
+ * @returns 청구서
+ */
+function renderPlainText(data, plays) {
   /**
    * 적립 포인트 계산함수
    * @param {*} aPerformance 각 공연 관련 값
@@ -116,7 +117,7 @@ function renderPlainText(data, plays) {
   function totalAmount() {
     let result = 0; // 총액
     for (let perf of data.performances) {
-      result += amountFor(perf);
+      result += perf.amount;
     }
     return result;
   }
@@ -125,9 +126,7 @@ function renderPlainText(data, plays) {
   let result = `청구 내역 (고객명: ${data.customer})\n`; // 결과값 (기본으로 고객명)
   for (let perf of data.performances) {
     // 청구 내역을 출력한다.
-    result += `${perf.play.name}: ${usd(amountFor(perf))} (${
-      perf.audience
-    }석)\n`;
+    result += `${perf.play.name}: ${usd(perf.amount)} (${perf.audience}석)\n`;
   }
   result += `총액: ${usd(totalAmount())}\n`;
   result += `적립 포인트 : ${totalVolumeCredits()}점\n`;

@@ -75,24 +75,36 @@ function statement(invoice, plays) {
     return volumeCredits;
   }
 
+  /**
+   * 적립 포인트 총합 계산함수
+   * @returns
+   */
+  function totalVolumeCredits() {
+    let volumeCredits = 0; // 공연 적립 포인트
+    for (let perf of invoice.performances) {
+      // 적립 포인트 계산 후 적용
+      volumeCredits += volumeCreditsFor(perf);
+    }
+
+    return volumeCredits;
+  }
+
   // 청구내역 최종 결과 관련 로직
   let totalAmount = 0; // 총액
-  let volumeCredits = 0; // 공연 포인트
   let result = `청구 내역 (고객명: ${invoice.customer})\n`; // 결과값 (기본으로 고객명)
 
   for (let perf of invoice.performances) {
-    // 적립 포인트 계산 후 적용
-    volumeCredits += volumeCreditsFor(perf);
     // 청구 내역을 출력한다.
     result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${
       perf.audience
     }석)\n`;
     totalAmount += amountFor(perf);
   }
+  // 적립 포인트 총합 계산 적용
+  let volumeCredits = totalVolumeCredits();
 
   result += `총액: ${usd(totalAmount)}\n`;
   result += `적립 포인트 : ${volumeCredits}점\n`;
-
   return result;
 }
 

@@ -1,7 +1,7 @@
 /**
  * 달러 포맷함수
  * @param {Number} aNumber 포맷할 넘버
- * @returns
+ * @returns 달러 포맷된 문자열
  */
 function usd(aNumber) {
   const formattedNumber = new Intl.NumberFormat("en-US", {
@@ -17,7 +17,7 @@ function usd(aNumber) {
  * 공연료 청구서를 출력하는 함수
  * @param {*} invoice 공연 청구서
  * @param {*} plays 공연 시나리오 정보
- * @returns
+ * @returns 청구서
  */
 function statement(invoice, plays) {
   /**
@@ -32,7 +32,7 @@ function statement(invoice, plays) {
    * 금액 계산 함수
    * @param {*} aPerformance 각 공연 관련 값
    * @param {*} play 각 공연 시나리오 개별값
-   * @returns
+   * @returns 금액 계산값
    */
   function amountFor(aPerformance) {
     let result = 0; // 각 공연의 금액
@@ -62,7 +62,7 @@ function statement(invoice, plays) {
   /**
    * 적립 포인트 계산함수
    * @param {*} aPerformance 각 공연 관련 값
-   * @returns
+   * @returns 적립 포인트 계산
    */
   function volumeCreditsFor(aPerformance) {
     let volumeCredits = 0; // 공연 포인트
@@ -77,31 +77,38 @@ function statement(invoice, plays) {
 
   /**
    * 적립 포인트 총합 계산함수
-   * @returns
+   * @returns 적립 포인트 총합
    */
   function totalVolumeCredits() {
-    let volumeCredits = 0; // 공연 적립 포인트
+    let result = 0; // 공연 적립 포인트
     for (let perf of invoice.performances) {
       // 적립 포인트 계산 후 적용
-      volumeCredits += volumeCreditsFor(perf);
+      result += volumeCreditsFor(perf);
     }
-
-    return volumeCredits;
+    return result;
   }
 
-  // 청구내역 최종 결과 관련 로직
-  let totalAmount = 0; // 총액
-  let result = `청구 내역 (고객명: ${invoice.customer})\n`; // 결과값 (기본으로 고객명)
+  /**
+   * 총액 계산함수
+   * @returns 총액값
+   */
+  function totalAmount() {
+    let result = 0; // 총액
+    for (let perf of invoice.performances) {
+      result += amountFor(perf);
+    }
+    return result;
+  }
 
+  // 청구내역 최종 결과로직
+  let result = `청구 내역 (고객명: ${invoice.customer})\n`; // 결과값 (기본으로 고객명)
   for (let perf of invoice.performances) {
     // 청구 내역을 출력한다.
     result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${
       perf.audience
     }석)\n`;
-    totalAmount += amountFor(perf);
   }
-
-  result += `총액: ${usd(totalAmount)}\n`;
+  result += `총액: ${usd(totalAmount())}\n`;
   result += `적립 포인트 : ${totalVolumeCredits()}점\n`;
   return result;
 }

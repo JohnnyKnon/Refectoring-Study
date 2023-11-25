@@ -29,7 +29,16 @@ function statement(invoice, plays) {
   // 얕은복사 함수
   function enrichPerformance(aPerformance) {
     const result = Object.assign({}, aPerformance); // 얕은 복사 수행
+    result.play = playFor(result);
     return result;
+  }
+
+  /**
+   * 공연 시나리오 값을 불러오는 질의함수
+   * @param {*} aPerformance 각 공연 관련 값
+   */
+  function playFor(aPerformance) {
+    return plays[aPerformance.playID];
   }
 }
 
@@ -41,14 +50,6 @@ function statement(invoice, plays) {
  */
 function renderPlainText(data, plays) {
   /**
-   * 공연 시나리오 값을 불러오는 질의함수
-   * @param {*} aPerformance 각 공연 관련 값
-   */
-  function playFor(aPerformance) {
-    return plays[aPerformance.playID];
-  }
-
-  /**
    * 금액 계산 함수
    * @param {*} aPerformance 각 공연 관련 값
    * @param {*} play 각 공연 시나리오 개별값
@@ -57,7 +58,7 @@ function renderPlainText(data, plays) {
   function amountFor(aPerformance) {
     let result = 0; // 각 공연의 금액
 
-    switch (playFor(aPerformance).type) {
+    switch (aPerformance.play.type) {
       case "tragedy": // 비극
         result = 40000;
         if (aPerformance.audience > 30) {
@@ -73,7 +74,7 @@ function renderPlainText(data, plays) {
         result += 300 * aPerformance.audience;
         break;
       default:
-        throw new Error(`알 수 없는 장르: ${playFor(aPerformance).type}`);
+        throw new Error(`알 수 없는 장르: ${aPerformance.play.type}`);
     }
 
     return result;
@@ -89,7 +90,7 @@ function renderPlainText(data, plays) {
     // 포인트를 적립한다.
     volumeCredits += Math.max(aPerformance.audience - 30, 0);
     // 희극 관객 5명마다 추가 포인트를 제공한다.
-    if ("comedy" === playFor(aPerformance).type)
+    if ("comedy" === aPerformance.play.type)
       volumeCredits += Math.floor(aPerformance.audience / 5);
 
     return volumeCredits;
@@ -124,7 +125,7 @@ function renderPlainText(data, plays) {
   let result = `청구 내역 (고객명: ${data.customer})\n`; // 결과값 (기본으로 고객명)
   for (let perf of data.performances) {
     // 청구 내역을 출력한다.
-    result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${
+    result += `${perf.play.name}: ${usd(amountFor(perf))} (${
       perf.audience
     }석)\n`;
   }

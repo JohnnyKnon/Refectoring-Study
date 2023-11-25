@@ -1,14 +1,14 @@
 /**
  * 달러 포맷함수
- * @param {Number} num 포맷할 넘버
+ * @param {Number} aNumber 포맷할 넘버
  * @returns
  */
-function format(num) {
+function usd(aNumber) {
   const formattedNumber = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
     minimumFractionDigits: 2,
-  }).format(num);
+  }).format(aNumber / 100); // 단위 변환 로직
 
   return formattedNumber;
 }
@@ -61,7 +61,7 @@ function statement(invoice, plays) {
 
   /**
    * 적립 포인트 계산함수
-   * @param {*} perf 각 공연 관련 값
+   * @param {*} aPerformance 각 공연 관련 값
    * @returns
    */
   function volumeCreditsFor(aPerformance) {
@@ -84,13 +84,13 @@ function statement(invoice, plays) {
     // 적립 포인트 계산 후 적용
     volumeCredits += volumeCreditsFor(perf);
     // 청구 내역을 출력한다.
-    result += `${playFor(perf).name}: ${format(amountFor(perf) / 100)} (${
+    result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${
       perf.audience
     }석)\n`;
     totalAmount += amountFor(perf);
   }
 
-  result += `총액: ${format(totalAmount / 100)}\n`;
+  result += `총액: ${usd(amountFor(perf))}\n`;
   result += `적립 포인트 : ${volumeCredits}점\n`;
 
   return result;

@@ -14,56 +14,65 @@ function format(num) {
 }
 
 /**
- * 금액 계산기
- * @param {*} aPerformance 각 공연 관련 값
- * @param {*} play 각 공연 시나리오 개별값
- */
-function amountFor(aPerformance, play) {
-  let result = 0; // 각 공연의 금액
-
-  switch (play.type) {
-    case "tragedy": // 비극
-      result = 40000;
-      if (aPerformance.audience > 30) {
-        // 관객이 30을 넘길 경우
-        result += 1000 * (aPerformance.audience - 30);
-      }
-      break;
-    case "comedy": // 희극
-      result = 30000;
-      if (aPerformance.audience > 20) {
-        result += 10000 + 500 * (aPerformance.audience - 20);
-      }
-      result += 300 * aPerformance.audience;
-      break;
-    default:
-      throw new Error(`알 수 없는 장르: ${play.type}`);
-  }
-
-  return result;
-}
-
-/**
  * 공연료 청구서를 출력하는 함수
  * @param {*} invoice 공연 청구서
  * @param {*} plays 공연 시나리오 정보
  */
 function statement(invoice, plays) {
+  /**
+   * 공연 시나리오 값을 불러오는 질의함수
+   * @param {*} aPerformance 각 공연 관련 값
+   */
+  function playFor(aPerformance) {
+    return plays[aPerformance.playID];
+  }
+
+  /**
+   * 금액 계산기
+   * @param {*} aPerformance 각 공연 관련 값
+   * @param {*} play 각 공연 시나리오 개별값
+   */
+  function amountFor(aPerformance) {
+    let result = 0; // 각 공연의 금액
+
+    switch (playFor(aPerformance).type) {
+      case "tragedy": // 비극
+        result = 40000;
+        if (aPerformance.audience > 30) {
+          // 관객이 30을 넘길 경우
+          result += 1000 * (aPerformance.audience - 30);
+        }
+        break;
+      case "comedy": // 희극
+        result = 30000;
+        if (aPerformance.audience > 20) {
+          result += 10000 + 500 * (aPerformance.audience - 20);
+        }
+        result += 300 * aPerformance.audience;
+        break;
+      default:
+        throw new Error(`알 수 없는 장르: ${playFor(aPerformance).type}`);
+    }
+
+    return result;
+  }
+
+  // 청구내역 최종 결과 관련 로직
   let totalAmount = 0; // 총액
   let volumeCredits = 0; // 공연 포인트
   let result = `청구 내역 (고객명: ${invoice.customer})\n`; // 결과값
 
   for (let perf of invoice.performances) {
-    const play = plays[perf.playID]; // 해당하는 공연정보
-    let thisAmount = amountFor(perf, play);
+    let thisAmount = amountFor(perf);
 
     // 포인트를 적립한다.
     volumeCredits += Math.max(perf.audience - 30, 0);
     // 희극 관객 5명마다 추가 포인트를 제공한다.
-    if ("comedy" === play.type) volumeCredits += Math.floor(perf.audience / 5);
+    if ("comedy" === playFor(perf).type)
+      volumeCredits += Math.floor(perf.audience / 5);
 
     // 청구 내역을 출력한다.
-    result += `${play.name}: ${format(thisAmount / 100)} (${
+    result += `${playFor(perf).name}: ${format(thisAmount / 100)} (${
       perf.audience
     }석)\n`;
     totalAmount += thisAmount;

@@ -21,18 +21,18 @@ function usd(aNumber) {
  */
 function statement(invoice, plays) {
   const statementData = {};
-  statementData.customer = invoice.customer;
-  return renderPlainText(statementData, invoice, plays);
+  statementData.customer = invoice.customer; // 고객정보
+  statementData.performances = invoice.performances; // 공연정보
+  return renderPlainText(statementData, plays);
 }
 
 /**
  * 공연료 청구서를 단순 텍스트로 출력하는 함수
- * @param {*} data 데이터 구조 역할
- * @param {*} invoice 공연 청구서
+ * @param {*} data 고객정보, 공연정보,
  * @param {*} plays 공연 시나리오 정보
  * @returns 청구서
  */
-function renderPlainText(data, invoice, plays) {
+function renderPlainText(data, plays) {
   /**
    * 공연 시나리오 값을 불러오는 질의함수
    * @param {*} aPerformance 각 공연 관련 값
@@ -94,7 +94,7 @@ function renderPlainText(data, invoice, plays) {
    */
   function totalVolumeCredits() {
     let result = 0; // 공연 적립 포인트
-    for (let perf of invoice.performances) {
+    for (let perf of data.performances) {
       // 적립 포인트 계산 후 적용
       result += volumeCreditsFor(perf);
     }
@@ -107,7 +107,7 @@ function renderPlainText(data, invoice, plays) {
    */
   function totalAmount() {
     let result = 0; // 총액
-    for (let perf of invoice.performances) {
+    for (let perf of data.performances) {
       result += amountFor(perf);
     }
     return result;
@@ -115,7 +115,7 @@ function renderPlainText(data, invoice, plays) {
 
   // 청구내역 최종 결과로직
   let result = `청구 내역 (고객명: ${data.customer})\n`; // 결과값 (기본으로 고객명)
-  for (let perf of invoice.performances) {
+  for (let perf of data.performances) {
     // 청구 내역을 출력한다.
     result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${
       perf.audience

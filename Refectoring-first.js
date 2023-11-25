@@ -20,6 +20,16 @@ function usd(aNumber) {
  * @returns 청구서
  */
 function statement(invoice, plays) {
+  return renderPlainText(invoice, plays);
+}
+
+/**
+ * 공연료 청구서를 단순 텍스트로 출력하는 함수
+ * @param {*} invoice 공연 청구서
+ * @param {*} plays 공연 시나리오 정보
+ * @returns 청구서
+ */
+function renderPlainText(invoice, plays) {
   /**
    * 공연 시나리오 값을 불러오는 질의함수
    * @param {*} aPerformance 각 공연 관련 값

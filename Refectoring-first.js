@@ -22,8 +22,15 @@ function usd(aNumber) {
 function statement(invoice, plays) {
   const statementData = {};
   statementData.customer = invoice.customer; // 고객정보
-  statementData.performances = invoice.performances; // 공연정보
+  statementData.performances = invoice.performances.map(enrichPerformance); // 공연정보 -> 얕은복사를 통해서 불변성을 지키려함
+
   return renderPlainText(statementData, plays);
+
+  // 얕은복사 함수
+  function enrichPerformance(aPerformance) {
+    const result = Object.assign({}, aPerformance); // 얕은 복사 수행
+    return result;
+  }
 }
 
 /**

@@ -1,5 +1,5 @@
 /**
- *3자리수 콤마찍는 함수
+ * 달러 포맷함수
  * @param {Number} num 포맷할 넘버
  * @returns
  */
@@ -8,16 +8,45 @@ function format(num) {
     style: "currency",
     currency: "USD",
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
   }).format(num);
 
   return formattedNumber;
 }
 
 /**
+ * 금액 계산기
+ * @param {*} perf 각 공연 관련 값
+ * @param {*} play 각 공연 시나리오 개별값
+ */
+function amountFor(perf, play) {
+  let thisAmount = 0; // 각 공연의 금액
+
+  switch (play.type) {
+    case "tragedy": // 비극
+      thisAmount = 40000;
+      if (perf.audience > 30) {
+        // 관객이 30을 넘길 경우
+        thisAmount += 1000 * (perf.audience - 30);
+      }
+      break;
+    case "comedy": // 희극
+      thisAmount = 30000;
+      if (perf.audience > 20) {
+        thisAmount += 10000 + 500 * (perf.audience - 20);
+      }
+      thisAmount += 300 * perf.audience;
+      break;
+    default:
+      throw new Error(`알 수 없는 장르: ${play.type}`);
+  }
+
+  return thisAmount;
+}
+
+/**
  * 공연료 청구서를 출력하는 함수
- * @param {*} invoice 청구서
- * @param {*} plays 공연정보
+ * @param {*} invoice 공연 청구서
+ * @param {*} plays 공연 시나리오 정보
  */
 function statement(invoice, plays) {
   let totalAmount = 0; // 총액
@@ -26,26 +55,7 @@ function statement(invoice, plays) {
 
   for (let perf of invoice.performances) {
     const play = plays[perf.playID]; // 해당하는 공연정보
-    let thisAmount = 0; // 각 공연의 금액
-
-    switch (play.type) {
-      case "tragedy": // 비극
-        thisAmount = 40000;
-        if (perf.audience > 30) {
-          // 관객이 30을 넘길 경우
-          thisAmount += 1000 * (perf.audience - 30);
-        }
-        break;
-      case "comedy": // 희극
-        thisAmount = 30000;
-        if (perf.audience > 20) {
-          thisAmount += 10000 + 500 * (perf.audience - 20);
-        }
-        thisAmount += 300 * perf.audience;
-        break;
-      default:
-        throw new Error(`알 수 없는 장르: ${play.type}`);
-    }
+    let thisAmount = amountFor(perf, play);
 
     // 포인트를 적립한다.
     volumeCredits += Math.max(perf.audience - 30, 0);

@@ -17,6 +17,7 @@ function format(num) {
  * 공연료 청구서를 출력하는 함수
  * @param {*} invoice 공연 청구서
  * @param {*} plays 공연 시나리오 정보
+ * @returns
  */
 function statement(invoice, plays) {
   /**
@@ -28,9 +29,10 @@ function statement(invoice, plays) {
   }
 
   /**
-   * 금액 계산기
+   * 금액 계산 함수
    * @param {*} aPerformance 각 공연 관련 값
    * @param {*} play 각 공연 시나리오 개별값
+   * @returns
    */
   function amountFor(aPerformance) {
     let result = 0; // 각 공연의 금액
@@ -57,25 +59,35 @@ function statement(invoice, plays) {
     return result;
   }
 
-  // 청구내역 최종 결과 관련 로직
-  let totalAmount = 0; // 총액
-  let volumeCredits = 0; // 공연 포인트
-  let result = `청구 내역 (고객명: ${invoice.customer})\n`; // 결과값
-
-  for (let perf of invoice.performances) {
-    let thisAmount = amountFor(perf);
-
+  /**
+   * 적립 포인트 계산함수
+   * @param {*} perf 각 공연 관련 값
+   * @returns
+   */
+  function volumeCreditsFor(perf) {
+    let volumeCredits = 0; // 공연 포인트
     // 포인트를 적립한다.
     volumeCredits += Math.max(perf.audience - 30, 0);
     // 희극 관객 5명마다 추가 포인트를 제공한다.
     if ("comedy" === playFor(perf).type)
       volumeCredits += Math.floor(perf.audience / 5);
 
+    return volumeCredits;
+  }
+
+  // 청구내역 최종 결과 관련 로직
+  let totalAmount = 0; // 총액
+  let volumeCredits = 0; // 공연 포인트
+  let result = `청구 내역 (고객명: ${invoice.customer})\n`; // 결과값 (기본으로 고객명)
+
+  for (let perf of invoice.performances) {
+    // 적립 포인트 계산 후 적용
+    volumeCredits += volumeCreditsFor(perf);
     // 청구 내역을 출력한다.
-    result += `${playFor(perf).name}: ${format(thisAmount / 100)} (${
+    result += `${playFor(perf).name}: ${format(amountFor(perf) / 100)} (${
       perf.audience
     }석)\n`;
-    totalAmount += thisAmount;
+    totalAmount += amountFor(perf);
   }
 
   result += `총액: ${format(totalAmount / 100)}\n`;

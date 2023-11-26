@@ -29,8 +29,10 @@ function statement(invoice, plays) {
   // 얕은복사 함수
   function enrichPerformance(aPerformance) {
     const result = Object.assign({}, aPerformance); // 얕은 복사 수행
-    result.play = playFor(result);
-    result.amount = amountFor(result);
+    result.play = playFor(result); // 연극정보
+    result.amount = amountFor(result); // 금액 계산
+    result.volumeCredits = volumeCreditsFor(result); // 적립 포인트 계산
+
     return result;
   }
 
@@ -72,15 +74,7 @@ function statement(invoice, plays) {
 
     return result;
   }
-}
 
-/**
- * 공연료 청구서를 단순 텍스트로 출력하는 함수
- * @param {*} data 고객정보, 공연정보,
- * @param {*} plays 공연 시나리오 정보
- * @returns 청구서
- */
-function renderPlainText(data, plays) {
   /**
    * 적립 포인트 계산함수
    * @param {*} aPerformance 각 공연 관련 값
@@ -96,7 +90,15 @@ function renderPlainText(data, plays) {
 
     return volumeCredits;
   }
+}
 
+/**
+ * 공연료 청구서를 단순 텍스트로 출력하는 함수
+ * @param {*} data 고객정보, 공연정보,
+ * @param {*} plays 공연 시나리오 정보
+ * @returns 청구서
+ */
+function renderPlainText(data, plays) {
   /**
    * 적립 포인트 총합 계산함수
    * @returns 적립 포인트 총합
@@ -105,7 +107,7 @@ function renderPlainText(data, plays) {
     let result = 0; // 공연 적립 포인트
     for (let perf of data.performances) {
       // 적립 포인트 계산 후 적용
-      result += volumeCreditsFor(perf);
+      result += perf.volumeCredits;
     }
     return result;
   }

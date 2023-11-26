@@ -96,11 +96,7 @@ function statement(invoice, plays) {
    * @returns 총액값
    */
   function totalAmount(data) {
-    let result = 0; // 총액
-    for (let perf of data.performances) {
-      result += perf.amount;
-    }
-    return result;
+    return data.performances.reduce((total, p) => total + p.amount, 0);
   }
 
   /**
@@ -108,12 +104,7 @@ function statement(invoice, plays) {
    * @returns 적립 포인트 총합
    */
   function totalVolumeCredits(data) {
-    let result = 0; // 공연 적립 포인트
-    for (let perf of data.performances) {
-      // 적립 포인트 계산 후 적용
-      result += perf.volumeCredits;
-    }
-    return result;
+    return data.performances.reduce((total, p) => total + p.volumeCredits, 0);
   }
 }
 

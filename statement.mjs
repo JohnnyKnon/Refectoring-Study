@@ -2,22 +2,7 @@
 import createStatementData from "./createStatementData.mjs";
 
 /**
- * 달러 포맷함수
- * @param {Number} aNumber 포맷할 넘버
- * @returns 달러 포맷된 문자열
- */
-function usd(aNumber) {
-  const formattedNumber = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-  }).format(aNumber / 100); // 단위 변환 로직
-
-  return formattedNumber;
-}
-
-/**
- * 공연료 청구서를 출력하는 함수
+ * 공연료 청구서를 출력하는 함수 (console)
  * @param {*} invoice 공연 청구서
  * @param {*} plays 공연 시나리오 정보
  * @returns 청구서
@@ -42,6 +27,48 @@ function renderPlainText(data, plays) {
   result += `총액: ${usd(data.totalAmount)}\n`;
   result += `적립 포인트 : ${data.totalVolumeCredits}점\n`;
   return result;
+}
+
+/**
+ * 공연료 청구서를 출력하는 함수 (UI)
+ * @param {*} invoice 공연 청구서
+ * @param {*} plays 공연 시나리오 정보
+ * @returns 청구서
+ */
+function htmlStatement(invoice, plays) {
+  return rederHtml(createStatementData(invoice, plays));
+}
+
+/**
+ * 공연료 청구서를 UI 출력하는 함수
+ * @param {*} data 고객정보, 공연정보,
+ * @returns 청구서
+ */
+function rederHtml(data) {
+  let result = `<h1>청구 내역 (고객명: ${data.customer})</h1> \n`;
+  result += "<table>\n";
+  result += "<tr><th>연극</th><th>좌석수</th><th>금액</th></tr>";
+  for (let perf of data.performances) {
+    result += `<tr><td>${perf.play.name}</td><td>${perf.audience}석</td>`;
+    result += `<td>${usd(perf.amount)}</td></tr>\n`;
+  }
+  result += "</table>\n";
+  return result;
+}
+
+/**
+ * 달러 포맷함수
+ * @param {Number} aNumber 포맷할 넘버
+ * @returns 달러 포맷된 문자열
+ */
+function usd(aNumber) {
+  const formattedNumber = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+  }).format(aNumber / 100); // 단위 변환 로직
+
+  return formattedNumber;
 }
 
 /**
@@ -86,7 +113,10 @@ const fetchData = async () => {
     ]);
 
     if (playsData && invoicesData) {
-      console.log(statement(invoicesData[0], playsData));
+      for (let invoice of invoicesData) {
+        console.log(statement(invoice, playsData));
+        document.body.innerHTML = htmlStatement(invoice, playsData);
+      }
     }
   } catch (error) {
     console.error("데이터를 불러오는 중 오류 발생:", error);

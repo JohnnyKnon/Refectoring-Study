@@ -54,7 +54,7 @@ export default function createStatementData(invoice, plays) {
     );
     const result = Object.assign({}, aPerformance); // 얕은 복사 수행
     result.play = playFor(result); // 연극정보
-    result.amount = amountFor(result); // 금액 계산
+    result.amount = calculator.amount; // 금액 계산
     result.volumeCredits = volumeCreditsFor(result); // 적립 포인트 계산
     return result;
   }
@@ -65,16 +65,6 @@ export default function createStatementData(invoice, plays) {
    */
   function playFor(aPerformance) {
     return plays[aPerformance.playID];
-  }
-
-  /**
-   * 금액 계산 함수
-   * @param {*} aPerformance 각 공연 관련 값
-   * @returns 금액 계산값
-   */
-  function amountFor(aPerformance) {
-    return new PerformanceCalculator(aPerformance, playFor(aPerformance))
-      .amount;
   }
 
   /**

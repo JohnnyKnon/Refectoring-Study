@@ -6,6 +6,7 @@ class PerformanceCalculator {
     this.performance = aPerformance; // 공연
     this.play = aPlay; // 공연정보
   }
+
   get amount() {
     let result = 0; // 각 공연의 금액
 
@@ -29,6 +30,17 @@ class PerformanceCalculator {
     }
 
     return result;
+  }
+
+  get volumeCredits() {
+    let volumeCredits = 0; // 공연 포인트
+    // 포인트를 적립한다.
+    volumeCredits += Math.max(this.performance.audience - 30, 0);
+    // 희극 관객 5명마다 추가 포인트를 제공한다.
+    if ("comedy" === this.play.type)
+      volumeCredits += Math.floor(this.performance.audience / 5);
+
+    return volumeCredits;
   }
 }
 
@@ -55,7 +67,7 @@ export default function createStatementData(invoice, plays) {
     const result = Object.assign({}, aPerformance); // 얕은 복사 수행
     result.play = playFor(result); // 연극정보
     result.amount = calculator.amount; // 금액 계산
-    result.volumeCredits = volumeCreditsFor(result); // 적립 포인트 계산
+    result.volumeCredits = calculator.volumeCredits; // 적립 포인트 계산
     return result;
   }
 
@@ -65,22 +77,6 @@ export default function createStatementData(invoice, plays) {
    */
   function playFor(aPerformance) {
     return plays[aPerformance.playID];
-  }
-
-  /**
-   * 적립 포인트 계산함수
-   * @param {*} aPerformance 각 공연 관련 값
-   * @returns 적립 포인트 계산
-   */
-  function volumeCreditsFor(aPerformance) {
-    let volumeCredits = 0; // 공연 포인트
-    // 포인트를 적립한다.
-    volumeCredits += Math.max(aPerformance.audience - 30, 0);
-    // 희극 관객 5명마다 추가 포인트를 제공한다.
-    if ("comedy" === aPerformance.play.type)
-      volumeCredits += Math.floor(aPerformance.audience / 5);
-
-    return volumeCredits;
   }
 
   /**

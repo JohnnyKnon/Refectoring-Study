@@ -53,6 +53,8 @@ function rederHtml(data) {
     result += `<td>${usd(perf.amount)}</td></tr>\n`;
   }
   result += "</table>\n";
+  result += `<p>총액 : <em>${usd(data.totalAmount)}</em></p>\n`;
+  result += `<p>적립 포인트 : <em>${data.totalVolumeCredits}</em>점</p>\n`;
   return result;
 }
 

@@ -23,7 +23,8 @@ function statement(invoice, plays) {
   const statementData = {};
   statementData.customer = invoice.customer; // 고객정보
   statementData.performances = invoice.performances.map(enrichPerformance); // 공연정보 -> 얕은복사를 통해서 불변성을 지키려함
-
+  statementData.totalAmount = totalAmount(statementData); //총액
+  statementData.totalVolumeCredits = totalVolumeCredits(statementData); // 적립포인트 총합
   return renderPlainText(statementData, plays);
 
   // 얕은복사 함수
@@ -32,7 +33,6 @@ function statement(invoice, plays) {
     result.play = playFor(result); // 연극정보
     result.amount = amountFor(result); // 금액 계산
     result.volumeCredits = volumeCreditsFor(result); // 적립 포인트 계산
-
     return result;
   }
 
@@ -90,6 +90,31 @@ function statement(invoice, plays) {
 
     return volumeCredits;
   }
+
+  /**
+   * 총액 계산함수
+   * @returns 총액값
+   */
+  function totalAmount(data) {
+    let result = 0; // 총액
+    for (let perf of data.performances) {
+      result += perf.amount;
+    }
+    return result;
+  }
+
+  /**
+   * 적립 포인트 총합 계산함수
+   * @returns 적립 포인트 총합
+   */
+  function totalVolumeCredits(data) {
+    let result = 0; // 공연 적립 포인트
+    for (let perf of data.performances) {
+      // 적립 포인트 계산 후 적용
+      result += perf.volumeCredits;
+    }
+    return result;
+  }
 }
 
 /**
@@ -99,39 +124,14 @@ function statement(invoice, plays) {
  * @returns 청구서
  */
 function renderPlainText(data, plays) {
-  /**
-   * 적립 포인트 총합 계산함수
-   * @returns 적립 포인트 총합
-   */
-  function totalVolumeCredits() {
-    let result = 0; // 공연 적립 포인트
-    for (let perf of data.performances) {
-      // 적립 포인트 계산 후 적용
-      result += perf.volumeCredits;
-    }
-    return result;
-  }
-
-  /**
-   * 총액 계산함수
-   * @returns 총액값
-   */
-  function totalAmount() {
-    let result = 0; // 총액
-    for (let perf of data.performances) {
-      result += perf.amount;
-    }
-    return result;
-  }
-
   // 청구내역 최종 결과로직
   let result = `청구 내역 (고객명: ${data.customer})\n`; // 결과값 (기본으로 고객명)
   for (let perf of data.performances) {
     // 청구 내역을 출력한다.
     result += `${perf.play.name}: ${usd(perf.amount)} (${perf.audience}석)\n`;
   }
-  result += `총액: ${usd(totalAmount())}\n`;
-  result += `적립 포인트 : ${totalVolumeCredits()}점\n`;
+  result += `총액: ${usd(data.totalAmount)}\n`;
+  result += `적립 포인트 : ${data.totalVolumeCredits}점\n`;
   return result;
 }
 

@@ -13,12 +13,7 @@ class PerformanceCalculator {
 
     switch (this.play.type) {
       case "tragedy": // 비극
-        result = 40000;
-        if (this.performance.audience > 30) {
-          // 관객이 30을 넘길 경우
-          result += 1000 * (this.performance.audience - 30);
-        }
-        break;
+        throw "오류 발생"; // 비극 공연료는 TragedyCalculator로 유도
       case "comedy": // 희극
         result = 30000;
         if (this.performance.audience > 20) {
@@ -52,9 +47,30 @@ class PerformanceCalculator {
  * @param {*} aPlay // 공연정보
  */
 function createPerformanceCalculator(aPerformance, aPlay) {
-  // 공연료 계산을 위한 로직 클래스
-  return new PerformanceCalculator(aPerformance, aPlay);
+  switch (aPlay.type) {
+    case "tragedy":
+      return new TragedyCalculator(aPerformance, aPlay);
+    case "comedy":
+      return new ComedyCalculator(aPerformance, aPlay);
+    default:
+      throw new Error(`알 수 없는 장르: ${aPlay.type}`);
+  }
 }
+
+// 비극 공연료 계산로직
+class TragedyCalculator extends PerformanceCalculator {
+  get amount() {
+    let result = 40000;
+    if (this.performance.audience > 30) {
+      result += 1000 * (this.performance.audience - 30);
+    }
+
+    return result;
+  }
+}
+
+// 희극 공연료 계산로직
+class ComedyCalculator extends PerformanceCalculator {}
 
 /**
  * 중간 데이터 생성 함수

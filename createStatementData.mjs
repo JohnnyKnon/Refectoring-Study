@@ -7,6 +7,7 @@ class PerformanceCalculator {
     this.play = aPlay; // 공연정보
   }
 
+  // 공연료 계산 메서드
   get amount() {
     let result = 0; // 각 공연의 금액
 
@@ -32,6 +33,7 @@ class PerformanceCalculator {
     return result;
   }
 
+  // 적립 포인트 계산 메서드
   get volumeCredits() {
     let volumeCredits = 0; // 공연 포인트
     // 포인트를 적립한다.
@@ -42,6 +44,16 @@ class PerformanceCalculator {
 
     return volumeCredits;
   }
+}
+
+/**
+ * 공연료 계산 로직 팩터리 함수
+ * @param {*} aPerformance // 공연
+ * @param {*} aPlay // 공연정보
+ */
+function createPerformanceCalculator(aPerformance, aPlay) {
+  // 공연료 계산을 위한 로직 클래스
+  return new PerformanceCalculator(aPerformance, aPlay);
 }
 
 /**
@@ -59,8 +71,7 @@ export default function createStatementData(invoice, plays) {
 
   // 얕은복사 함수
   function enrichPerformance(aPerformance) {
-    // 공연료 계산을 위한 로직 클래스
-    const calculator = new PerformanceCalculator(
+    const calculator = createPerformanceCalculator(
       aPerformance,
       playFor(aPerformance)
     );

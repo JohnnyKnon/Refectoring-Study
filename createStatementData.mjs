@@ -69,26 +69,6 @@ class ComedyCalculator extends PerformanceCalculator {
  * @param {*} plays 공연 시나리오 정보
  */
 export default function createStatementData(invoice, plays) {
-  const statementData = {};
-  statementData.customer = invoice.customer; // 고객정보
-  statementData.performances = invoice.performances.map(enrichPerformance); // 공연정보 -> 얕은복사를 통해서 불변성을 지키려함
-  statementData.totalAmount = totalAmount(statementData); //총액
-  statementData.totalVolumeCredits = totalVolumeCredits(statementData); // 적립포인트 총합
-  return statementData;
-
-  // 얕은복사 함수
-  function enrichPerformance(aPerformance) {
-    const calculator = createPerformanceCalculator(
-      aPerformance,
-      playFor(aPerformance)
-    );
-    const result = Object.assign({}, aPerformance); // 얕은 복사 수행
-    result.play = playFor(result); // 연극정보
-    result.amount = calculator.amount; // 금액 계산
-    result.volumeCredits = calculator.volumeCredits; // 적립 포인트 계산
-    return result;
-  }
-
   /**
    * 공연 시나리오 값을 불러오는 질의함수
    * @param {*} aPerformance 각 공연 관련 값
@@ -111,5 +91,25 @@ export default function createStatementData(invoice, plays) {
    */
   function totalVolumeCredits(data) {
     return data.performances.reduce((total, p) => total + p.volumeCredits, 0);
+  }
+
+  const statementData = {};
+  statementData.customer = invoice.customer; // 고객정보
+  statementData.performances = invoice.performances.map(enrichPerformance); // 공연정보 -> 얕은복사를 통해서 불변성을 지키려함
+  statementData.totalAmount = totalAmount(statementData); //총액
+  statementData.totalVolumeCredits = totalVolumeCredits(statementData); // 적립포인트 총합
+  return statementData;
+
+  // 얕은복사 함수
+  function enrichPerformance(aPerformance) {
+    const calculator = createPerformanceCalculator(
+      aPerformance,
+      playFor(aPerformance)
+    );
+    const result = Object.assign({}, aPerformance); // 얕은 복사 수행
+    result.play = playFor(result); // 연극정보
+    result.amount = calculator.amount; // 금액 계산
+    result.volumeCredits = calculator.volumeCredits; // 적립 포인트 계산
+    return result;
   }
 }

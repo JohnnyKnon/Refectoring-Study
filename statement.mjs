@@ -17,7 +17,7 @@ function statement(invoice, plays) {
  * @param {*} plays 공연 시나리오 정보
  * @returns 청구서
  */
-function renderPlainText(data, plays) {
+function renderPlainText(data) {
   // 청구내역 최종 결과로직
   let result = `청구 내역 (고객명: ${data.customer})\n`; // 결과값 (기본으로 고객명)
   for (let perf of data.performances) {

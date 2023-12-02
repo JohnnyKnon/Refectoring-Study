@@ -14,14 +14,7 @@ class PerformanceCalculator {
 
   // 적립 포인트 계산 메서드
   get volumeCredits() {
-    let volumeCredits = 0; // 공연 포인트
-    // 포인트를 적립한다.
-    volumeCredits += Math.max(this.performance.audience - 30, 0);
-    // 희극 관객 5명마다 추가 포인트를 제공한다.
-    if ("comedy" === this.play.type)
-      volumeCredits += Math.floor(this.performance.audience / 5);
-
-    return volumeCredits;
+    return Math.max(this.performance.audience - 30, 0);
   }
 }
 
@@ -62,6 +55,11 @@ class ComedyCalculator extends PerformanceCalculator {
     }
     result += 300 * this.performance.audience;
     return result;
+  }
+
+  // 희극 적립 포인트 추가 로직
+  get volumeCredits() {
+    return super.volumeCredits + Math.floor(this.performance.audience / 5);
   }
 }
 

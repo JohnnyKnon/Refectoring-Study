@@ -2,22 +2,12 @@
 import createStatementData from "./createStatementData.mjs";
 
 /**
- * 공연료 청구서를 출력하는 함수 (console)
- * @param {*} invoice 공연 청구서
- * @param {*} plays 공연 시나리오 정보
- * @returns 청구서
- */
-function statement(invoice, plays) {
-  return renderPlainText(createStatementData(invoice, plays));
-}
-
-/**
- * 공연료 청구서를 단순 텍스트로 출력하는 함수
+ * 공연료 청구서를 로그로 출력하는 함수
  * @param {*} data 고객정보, 공연정보,
  * @param {*} plays 공연 시나리오 정보
  * @returns 청구서
  */
-function renderPlainText(data) {
+const renderPlainText = (data) => {
   // 청구내역 최종 결과로직
   let result = `청구 내역 (고객명: ${data.customer})\n`; // 결과값 (기본으로 고객명)
   for (let perf of data.performances) {
@@ -27,7 +17,17 @@ function renderPlainText(data) {
   result += `총액: ${usd(data.totalAmount)}\n`;
   result += `적립 포인트 : ${data.totalVolumeCredits}점\n`;
   return result;
-}
+};
+
+/**
+ * 공연료 청구서를 출력하는 함수 (console)
+ * @param {*} invoice 공연 청구서
+ * @param {*} plays 공연 시나리오 정보
+ * @returns 청구서
+ */
+const statement = (invoice, plays) => {
+  return renderPlainText(createStatementData(invoice, plays));
+};
 
 /**
  * 공연료 청구서를 출력하는 함수 (UI)
@@ -35,16 +35,16 @@ function renderPlainText(data) {
  * @param {*} plays 공연 시나리오 정보
  * @returns 청구서
  */
-function htmlStatement(invoice, plays) {
-  return rederHtml(createStatementData(invoice, plays));
-}
+const htmlStatement = (invoice, plays) => {
+  return renderHtml(createStatementData(invoice, plays));
+};
 
 /**
  * 공연료 청구서를 UI 출력하는 함수
  * @param {*} data 고객정보, 공연정보,
  * @returns 청구서
  */
-function rederHtml(data) {
+const renderHtml = (data) => {
   let result = `<h1>청구 내역 (고객명: ${data.customer})</h1> \n`;
   result += "<table>\n";
   result += "<tr><th>연극</th><th>좌석수</th><th>금액</th></tr>";
@@ -56,14 +56,14 @@ function rederHtml(data) {
   result += `<p>총액 : <em>${usd(data.totalAmount)}</em></p>\n`;
   result += `<p>적립 포인트 : <em>${data.totalVolumeCredits}</em>점</p>\n`;
   return result;
-}
+};
 
 /**
  * 달러 포맷함수
  * @param {Number} aNumber 포맷할 넘버
  * @returns 달러 포맷된 문자열
  */
-function usd(aNumber) {
+const usd = (aNumber) => {
   const formattedNumber = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -71,7 +71,7 @@ function usd(aNumber) {
   }).format(aNumber / 100); // 단위 변환 로직
 
   return formattedNumber;
-}
+};
 
 /**
  * plays.json 파일을 가져오는 함수
